@@ -1,151 +1,189 @@
 {% extends "base.html" %}
-
-{% block title %}Home - Community Food Waste Rescue Network{% endblock %}
+{% block title %}Home — NoHunger Food Rescue Network{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="hero-section text-center">
-    <div class="container px-4">
-        <h1 class="display-4 fw-extrabold mb-3">Rescuing Food, Sustaining Communities</h1>
-        <p class="lead mb-4 mx-auto" style="max-width: 700px; font-weight: 400;">
-            Connecting local businesses and households with food surpluses to NGOs and volunteers. Join us in achieving UN SDG Goal 2: Zero Hunger.
+
+<!-- Hero -->
+<section class="hero-section text-center">
+    <div class="container px-4 position-relative">
+        <span class="badge bg-white bg-opacity-10 text-white mb-3 px-3 py-2"
+            style="border:1px solid rgba(255,255,255,0.2);font-size:0.8rem;letter-spacing:1px;">🌍 UN SDG GOAL 2 — ZERO
+            HUNGER</span>
+        <h1 class="fw-bold mb-3">Rescuing Food,<br>Sustaining Communities</h1>
+        <p class="lead mb-5 mx-auto" style="max-width:620px;">
+            Connecting food surplus from businesses &amp; households to NGOs and volunteers — before it goes to waste.
         </p>
         {% if not current_user.is_authenticated %}
-            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-                <a href="{{ url_for('register') }}" class="btn btn-warning btn-lg px-4 gap-3 text-white fw-semibold shadow-sm">
-                    <i class="bi bi-person-plus-fill me-2"></i>Get Started Today
-                </a>
-                <a href="{{ url_for('about') }}" class="btn btn-outline-light btn-lg px-4 shadow-sm">
-                    Learn About Our Mission
-                </a>
-            </div>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <a href="{{ url_for('register') }}" class="btn btn-warning btn-lg px-5 shadow">
+                <i class="bi bi-person-plus-fill me-2"></i>Join the Network
+            </a>
+            <a href="{{ url_for('about') }}" class="btn btn-outline-light btn-lg px-5">
+                Our Mission <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
         {% else %}
-            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-                {% if current_user.role == 'donor' %}
-                    <a href="{{ url_for('donor_dashboard') }}" class="btn btn-warning btn-lg px-4 text-white fw-semibold shadow-sm">Go to Dashboard</a>
-                {% elif current_user.role == 'ngo' %}
-                    <a href="{{ url_for('ngo_dashboard') }}" class="btn btn-warning btn-lg px-4 text-white fw-semibold shadow-sm">Go to Dashboard</a>
-                {% elif current_user.role == 'volunteer' %}
-                    <a href="{{ url_for('volunteer_dashboard') }}" class="btn btn-warning btn-lg px-4 text-white fw-semibold shadow-sm">Go to Dashboard</a>
-                {% elif current_user.role == 'admin' %}
-                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-warning btn-lg px-4 text-white fw-semibold shadow-sm">Admin Panel</a>
-                {% endif %}
-            </div>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+            {% if current_user.role == 'donor' %}
+            <a href="{{ url_for('donor_dashboard') }}" class="btn btn-warning btn-lg px-5 shadow">Go to Dashboard</a>
+            {% elif current_user.role == 'ngo' %}
+            <a href="{{ url_for('ngo_dashboard') }}" class="btn btn-warning btn-lg px-5 shadow">Go to Dashboard</a>
+            {% elif current_user.role == 'volunteer' %}
+            <a href="{{ url_for('volunteer_dashboard') }}" class="btn btn-warning btn-lg px-5 shadow">Go to
+                Dashboard</a>
+            {% elif current_user.role == 'admin' %}
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-warning btn-lg px-5 shadow">Admin Panel</a>
+            {% endif %}
+        </div>
         {% endif %}
     </div>
-</div>
+</section>
 
-<!-- Key Impact Statistics -->
-<div class="container my-5">
-    <div class="row g-4 justify-content-center">
+<!-- Impact Stats -->
+<section class="container my-5">
+    <div class="row g-4">
         <div class="col-md-3 col-sm-6">
-            <a href="{{ url_for('analytics') }}" class="card stat-card green p-3 text-center h-100">
-                <div class="card-icon green mx-auto mb-3">
-                    <i class="bi bi-gift-fill"></i>
+            <a href="{{ url_for('analytics') }}" class="stat-card green p-4 h-100 d-flex align-items-center gap-3"
+                style="text-decoration:none;">
+                <div class="card-icon green flex-shrink-0"><i class="bi bi-gift-fill"></i></div>
+                <div>
+                    <div class="stat-number text-green">{{ stats.total_donations }}</div>
+                    <div class="small fw-bold text-muted text-uppercase" style="letter-spacing:.5px;font-size:.72rem;">
+                        Donations</div>
                 </div>
-                <h3 class="fw-bold text-green mb-1">{{ stats.total_donations }}</h3>
-                <p class="text-muted mb-0 small uppercase fw-bold">Total Food Donated</p>
             </a>
         </div>
         <div class="col-md-3 col-sm-6">
-            <a href="{{ url_for('analytics') }}" class="card stat-card orange p-3 text-center h-100">
-                <div class="card-icon orange mx-auto mb-3">
-                    <i class="bi bi-heart-pulse-fill"></i>
+            <a href="{{ url_for('analytics') }}" class="stat-card orange p-4 h-100 d-flex align-items-center gap-3"
+                style="text-decoration:none;">
+                <div class="card-icon orange flex-shrink-0"><i class="bi bi-heart-pulse-fill"></i></div>
+                <div>
+                    <div class="stat-number text-orange">{{ stats.meals_saved }}</div>
+                    <div class="small fw-bold text-muted text-uppercase" style="letter-spacing:.5px;font-size:.72rem;">
+                        Meals Saved</div>
                 </div>
-                <h3 class="fw-bold text-orange mb-1">{{ stats.meals_saved }}</h3>
-                <p class="text-muted mb-0 small uppercase fw-bold">Meals Saved</p>
             </a>
         </div>
         <div class="col-md-3 col-sm-6">
-            <a href="{{ url_for('analytics') }}" class="card stat-card green p-3 text-center h-100">
-                <div class="card-icon green mx-auto mb-3">
-                    <i class="bi bi-people-fill"></i>
+            <a href="{{ url_for('analytics') }}" class="stat-card green p-4 h-100 d-flex align-items-center gap-3"
+                style="text-decoration:none;">
+                <div class="card-icon green flex-shrink-0"><i class="bi bi-people-fill"></i></div>
+                <div>
+                    <div class="stat-number text-green">{{ stats.active_users }}</div>
+                    <div class="small fw-bold text-muted text-uppercase" style="letter-spacing:.5px;font-size:.72rem;">
+                        Network Members</div>
                 </div>
-                <h3 class="fw-bold text-green mb-1">{{ stats.active_users }}</h3>
-                <p class="text-muted mb-0 small uppercase fw-bold">Active Network Users</p>
             </a>
         </div>
         <div class="col-md-3 col-sm-6">
-            <a href="{{ url_for('analytics') }}" class="card stat-card orange p-3 text-center h-100">
-                <div class="card-icon orange mx-auto mb-3">
-                    <i class="bi bi-truck"></i>
+            <a href="{{ url_for('analytics') }}" class="stat-card orange p-4 h-100 d-flex align-items-center gap-3"
+                style="text-decoration:none;">
+                <div class="card-icon orange flex-shrink-0"><i class="bi bi-truck"></i></div>
+                <div>
+                    <div class="stat-number text-orange">{{ stats.active_deliveries }}</div>
+                    <div class="small fw-bold text-muted text-uppercase" style="letter-spacing:.5px;font-size:.72rem;">
+                        Active Rescues</div>
                 </div>
-                <h3 class="fw-bold text-orange mb-1">{{ stats.active_deliveries }}</h3>
-                <p class="text-muted mb-0 small uppercase fw-bold">Active Rescues</p>
             </a>
         </div>
     </div>
-</div>
+</section>
 
-<!-- What We Do section -->
-<div class="bg-white py-5 border-top border-bottom border-light">
+<!-- How it Works -->
+<section class="py-5" style="background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
     <div class="container px-4">
         <div class="text-center mb-5">
-            <h2 class="fw-bold">How the Network Connects Us</h2>
-            <p class="text-muted mx-auto" style="max-width: 600px;">
-                Each role in our network performs a crucial part of the food waste rescue ecosystem.
-            </p>
+            <div class="section-label">How It Works</div>
+            <h2 class="fw-bold">Four Roles. One Mission.</h2>
+            <p class="text-muted mx-auto" style="max-width:520px;">Every person in our network plays a vital role in
+                getting food to those who need it most.</p>
         </div>
         <div class="row g-4">
-            <div class="col-md-3">
-                <div class="card h-100 border-0 shadow-sm p-4 text-center">
-                    <div class="fs-1 text-green mb-3"><i class="bi bi-shop"></i></div>
-                    <h5 class="fw-bold">1. Donors</h5>
-                    <p class="text-muted small">
-                        Restaurants, supermarkets, and catering companies easily upload edible food surplus details, expiry times, and pickup locations.
-                    </p>
+            <div class="col-md-3 col-sm-6">
+                <div class="feature-card">
+                    <div class="feature-step">Step 01</div>
+                    <div class="feature-icon green"><i class="bi bi-shop"></i></div>
+                    <h5 class="fw-bold mb-2">Donors</h5>
+                    <p class="text-muted small mb-0">Restaurants, supermarkets &amp; households upload surplus food with
+                        expiry times and pickup locations.</p>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card h-100 border-0 shadow-sm p-4 text-center">
-                    <div class="fs-1 text-orange mb-3"><i class="bi bi-building"></i></div>
-                    <h5 class="fw-bold">2. NGOs</h5>
-                    <p class="text-muted small">
-                        Shelters, soup kitchens, and non-profits browse available donations in real time and request pickups to feed those in need.
-                    </p>
+            <div class="col-md-3 col-sm-6">
+                <div class="feature-card">
+                    <div class="feature-step">Step 02</div>
+                    <div class="feature-icon orange"><i class="bi bi-building"></i></div>
+                    <h5 class="fw-bold mb-2">NGOs</h5>
+                    <p class="text-muted small mb-0">Shelters and non-profits browse available donations in real time
+                        and submit pickup requests.</p>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card h-100 border-0 shadow-sm p-4 text-center">
-                    <div class="fs-1 text-green mb-3"><i class="bi bi-bicycle"></i></div>
-                    <h5 class="fw-bold">3. Volunteers</h5>
-                    <p class="text-muted small">
-                        Deliver heroes claim delivery tasks, coordinate directly with donors and NGOs, and transport meals to their final destinations.
-                    </p>
+            <div class="col-md-3 col-sm-6">
+                <div class="feature-card">
+                    <div class="feature-step">Step 03</div>
+                    <div class="feature-icon green"><i class="bi bi-bicycle"></i></div>
+                    <h5 class="fw-bold mb-2">Volunteers</h5>
+                    <p class="text-muted small mb-0">Community volunteers claim delivery tasks and transport food from
+                        donors to NGOs.</p>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card h-100 border-0 shadow-sm p-4 text-center">
-                    <div class="fs-1 text-orange mb-3"><i class="bi bi-shield-lock"></i></div>
-                    <h5 class="fw-bold">4. Admins</h5>
-                    <p class="text-muted small">
-                        Verify users, monitor activities, track performance charts, and ensure seamless delivery coordinates across the system.
-                    </p>
+            <div class="col-md-3 col-sm-6">
+                <div class="feature-card">
+                    <div class="feature-step">Step 04</div>
+                    <div class="feature-icon orange"><i class="bi bi-shield-lock"></i></div>
+                    <h5 class="fw-bold mb-2">Admins</h5>
+                    <p class="text-muted small mb-0">Verify users, monitor all activity, track analytics, and keep the
+                        network running smoothly.</p>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<!-- UN SDG Goal 2 Spotlight -->
-<div class="container my-5 py-3">
+<!-- SDG Spotlight -->
+<section class="container my-5 py-3">
     <div class="row align-items-center g-5">
         <div class="col-lg-6">
-            <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800&auto=format&fit=crop" class="img-fluid rounded-4 shadow" alt="UN SDG 2 - Zero Hunger" style="max-height: 400px; width: 100%; object-fit: cover;">
+            <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800&auto=format&fit=crop"
+                class="img-fluid rounded-4 shadow-lg" alt="SDG Goal 2 Zero Hunger"
+                style="width:100%;max-height:420px;object-fit:cover;">
         </div>
         <div class="col-lg-6">
-            <span class="badge bg-orange text-white mb-2 text-uppercase fw-semibold">Global Focus</span>
-            <h2 class="fw-bold mb-3">Our Mission: UN SDG Goal 2</h2>
-            <p class="text-muted">
-                UN SDG Goal 2 focuses on ending hunger, achieving food security, improving nutrition, and promoting sustainable agriculture.
+            <div class="section-label">Global Focus</div>
+            <h2 class="fw-bold mb-3">Aligned With UN SDG Goal 2</h2>
+            <p class="text-muted mb-3">
+                SDG Goal 2 calls for an end to hunger, food insecurity, and all forms of malnutrition by 2030. One-third
+                of all food produced globally is wasted — while 700 million people go to bed hungry every night.
             </p>
-            <p class="text-muted">
-                One-third of all food produced globally goes to waste, while millions of people go hungry. By connecting food surplus straight to local shelters, we reduce landfill waste, carbon emissions, and hunger simultaneously.
+            <p class="text-muted mb-4">
+                By connecting surplus food directly to local NGOs, we reduce landfill emissions, lower carbon
+                footprints, and put nutritious meals on the tables of people who need them.
             </p>
-            <a href="{{ url_for('about') }}" class="btn btn-success mt-2">
-                Learn More About SDG 2 <i class="bi bi-arrow-right ms-2"></i>
+            <div class="d-flex gap-3 flex-wrap">
+                <a href="{{ url_for('about') }}" class="btn btn-success px-4">
+                    Learn More <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+                {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('register') }}" class="btn btn-outline-secondary px-4">Join Us</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Banner -->
+{% if not current_user.is_authenticated %}
+<section class="mb-5">
+    <div class="container">
+        <div class="rounded-4 p-5 text-center text-white"
+            style="background:linear-gradient(135deg,var(--green-900),var(--green-700));">
+            <h3 class="fw-bold mb-2">Ready to make a difference?</h3>
+            <p class="mb-4 opacity-75">Join donors, NGOs, and volunteers already rescuing food in your community.</p>
+            <a href="{{ url_for('register') }}" class="btn btn-warning btn-lg px-5">
+                <i class="bi bi-person-plus-fill me-2"></i>Get Started — It's Free
             </a>
         </div>
     </div>
-</div>
+</section>
+{% endif %}
+
 {% endblock %}
