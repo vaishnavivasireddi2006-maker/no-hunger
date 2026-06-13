@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Community Food Waste Rescue Network{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-header text-center">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-shield-lock-fill text-orange me-2"></i>Admin Panel</h5>
+            <span class="small opacity-75">Rescue Network</span>
+        </div>
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item">
+                <a class="nav-link active" href="#admin-overview" data-bs-toggle="tab">
+                    <i class="bi bi-speedometer2 me-2"></i>Overview
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#manage-users" data-bs-toggle="tab">
+                    <i class="bi bi-people-fill me-2"></i>Manage Users
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#manage-donations" data-bs-toggle="tab">
+                    <i class="bi bi-box2-heart-fill me-2"></i>Manage Donations
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#manage-requests" data-bs-toggle="tab">
+                    <i class="bi bi-card-checklist me-2"></i>Manage Requests
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#analytics" data-bs-toggle="tab">
+                    <i class="bi bi-bar-chart-line-fill me-2"></i>Analytics
+                </a>
+            </li>
+        </ul>
+        <div class="mt-auto p-3 border-top border-white border-opacity-10 text-center">
+            <small class="opacity-75">System administrator</small>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div class="dashboard-content tab-content">
+        <!-- Tab 1: Overview -->
+        <div class="tab-pane fade show active" id="admin-overview">
+            <h2 class="fw-bold mb-1">Welcome, Admin {{ current_user.username }}!</h2>
+            <p class="text-muted mb-4">Monitor community stats, system health, and logistics details.</p>
+
+            <!-- Stats Grid -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3 col-sm-6">
+                    <div class="card stat-card green p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="fw-bold mb-1">{{ users|length }}</h4>
+                                <p class="text-muted mb-0 small uppercase fw-semibold">Total Users</p>
+                            </div>
+                            <div class="card-icon green">
+                                <i class="bi bi-people"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card stat-card orange p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="fw-bold mb-1">{{ donations|length }}</h4>
+                                <p class="text-muted mb-0 small uppercase fw-semibold">Total Donations</p>
+                            </div>
+                            <div class="card-icon orange">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card stat-card green p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="fw-bold mb-1">{{ requests|length }}</h4>
+                                <p class="text-muted mb-0 small uppercase fw-semibold">Total Requests</p>
+                            </div>
+                            <div class="card-icon green">
+                                <i class="bi bi-file-earmark-text"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card stat-card orange p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="fw-bold mb-1">{{ completed_count }}</h4>
+                                <p class="text-muted mb-0 small uppercase fw-semibold">Meals Rescued</p>
+                            </div>
+                            <div class="card-icon orange">
+                                <i class="bi bi-globe-americas"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent activities -->
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                        <h5 class="fw-bold text-green mb-3"><i class="bi bi-person-plus-fill me-2"></i>Newest Registrations</h5>
+                        <ul class="list-group list-group-flush">
+                            {% for u in users[-5:]|reverse %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <div>
+                                        <h6 class="mb-0 fw-semibold">{{ u.username }}</h6>
+                                        <small class="text-muted">{{ u.email }}</small>
+                                    </div>
+                                    <span class="badge bg-light text-green border text-uppercase">{{ u.role }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                        <h5 class="fw-bold text-orange mb-3"><i class="bi bi-clock-history me-2"></i>Recent Surplus Donations</h5>
+                        <ul class="list-group list-group-flush">
+                            {% for d in donations[-5:]|reverse %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <div>
+                                        <h6 class="mb-0 fw-semibold">{{ d.food_item }}</h6>
+                                        <small class="text-muted">{{ d.quantity }} &bull; {{ d.food_type }}</small>
+                                    </div>
+                                    <span class="badge bg-success text-uppercase">{{ d.status }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Manage Users -->
+        <div class="tab-pane fade" id="manage-users">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h4 class="fw-bold mb-4 text-green"><i class="bi bi-people-fill me-2"></i>Manage Network Users</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Address</th>
+                                <th>Role</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in users %}
+                                <tr>
+                                    <td><strong>{{ u.username }}</strong></td>
+                                    <td>{{ u.email }}</td>
+                                    <td>{{ u.phone }}</td>
+                                    <td><span class="small text-truncate d-inline-block" style="max-width: 150px;">{{ u.address }}</span></td>
+                                    <td><span class="badge bg-light text-dark border text-uppercase">{{ u.role }}</span></td>
+                                    <td>{{ u.created_at.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        {% if u.id != current_user.id %}
+                                            <form action="{{ url_for('admin_delete_user', user_id=u.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this user? This will remove all their donations/requests.');" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </form>
+                                        {% else %}
+                                            <span class="text-muted small">Active Admin</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Manage Donations -->
+        <div class="tab-pane fade" id="manage-donations">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h4 class="fw-bold mb-4 text-green"><i class="bi bi-box2-heart-fill me-2"></i>Manage Food Donations</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Food Item</th>
+                                <th>Donor</th>
+                                <th>Category</th>
+                                <th>Quantity</th>
+                                <th>Expiry Time</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in donations %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if d.image_path %}
+                                                <img src="{{ url_for('static', filename='uploads/' + d.image_path) }}" width="35" height="35" class="rounded object-fit-cover me-2" alt="">
+                                            {% endif %}
+                                            <strong>{{ d.food_item }}</strong>
+                                        </div>
+                                    </td>
+                                    <td>{{ d.donor.username }}</td>
+                                    <td><span class="badge bg-light text-dark border">{{ d.food_type }}</span></td>
+                                    <td>{{ d.quantity }}</td>
+                                    <td><small>{{ d.expiry_time.strftime('%Y-%m-%d %H:%M') }}</small></td>
+                                    <td>
+                                        <span class="badge {% if d.status == 'available' %}bg-info{% elif d.status == 'requested' %}bg-warning{% elif d.status == 'assigned' %}bg-primary{% elif d.status == 'completed' %}bg-success{% else %}bg-secondary{% endif %} text-uppercase text-white">
+                                            {{ d.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <form action="{{ url_for('admin_delete_donation', donation_id=d.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this donation?');" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 4: Manage Requests -->
+        <div class="tab-pane fade" id="manage-requests">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h4 class="fw-bold mb-4 text-green"><i class="bi bi-card-checklist me-2"></i>Manage Pickup Requests</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Food Item</th>
+                                <th>NGO / Requester</th>
+                                <th>Donor</th>
+                                <th>Requested On</th>
+                                <th>Request Notes</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in requests %}
+                                <tr>
+                                    <td><strong>{{ r.donation.food_item }}</strong></td>
+                                    <td>{{ r.ngo.username }}</td>
+                                    <td>{{ r.donation.donor.username }}</td>
+                                    <td>{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td><span class="small text-muted">{{ r.request_notes or 'None' }}</span></td>
+                                    <td><span class="badge {% if r.status == 'pending' %}bg-warning{% elif r.status == 'accepted' %}bg-info{% elif r.status == 'completed' %}bg-success{% else %}bg-secondary{% endif %}">{{ r.status }}</span></td>
+                                    <td>
+                                        <form action="{{ url_for('admin_delete_request', request_id=r.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this request?');" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 5: Analytics Dashboard -->
+        <div class="tab-pane fade" id="analytics">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <div>
+                    <h4 class="fw-bold mb-0">System Analytics</h4>
+                    <p class="text-muted small mb-0">Live statistics generated from active database tables.</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('analytics') }}" class="btn btn-success fw-bold text-white shadow-sm btn-sm">
+                        View Standalone Analytics <i class="bi bi-arrow-up-right-square ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Dashboard Analytics grid -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                        <h5 class="fw-bold text-green mb-3"><i class="bi bi-graph-up me-2"></i>Monthly Rescue Trends (kg)</h5>
+                        <div style="height: 250px; position: relative;">
+                            <canvas id="donationTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                        <h5 class="fw-bold text-orange mb-3"><i class="bi bi-pie-chart me-2"></i>Food Categories</h5>
+                        <div style="height: 250px; position: relative;">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-12">
+                    <div class="card border-0 shadow-sm rounded-4 p-4">
+                        <h5 class="fw-bold text-green mb-3"><i class="bi bi-bar-chart me-2"></i>Food Rescued vs Pending vs Expired</h5>
+                        <div style="height: 220px; position: relative;">
+                            <canvas id="rescueRateChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

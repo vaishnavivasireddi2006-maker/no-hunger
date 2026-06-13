@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Community Food Waste Rescue Network{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section text-center">
+    <div class="container px-4">
+        <h1 class="display-4 fw-extrabold mb-3">Rescuing Food, Sustaining Communities</h1>
+        <p class="lead mb-4 mx-auto" style="max-width: 700px; font-weight: 400;">
+            Connecting local businesses and households with food surpluses to NGOs and volunteers. Join us in achieving UN SDG Goal 2: Zero Hunger.
+        </p>
+        {% if not current_user.is_authenticated %}
+            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                <a href="{{ url_for('register') }}" class="btn btn-warning btn-lg px-4 gap-3 text-white fw-semibold shadow-sm">
+                    <i class="bi bi-person-plus-fill me-2"></i>Get Started Today
+                </a>
+                <a href="{{ url_for('about') }}" class="btn btn-outline-light btn-lg px-4 shadow-sm">
+                    Learn About Our Mission
+                </a>
+            </div>
+        {% else %}
+            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                {% if current_user.role == 'donor' %}
+                    <a href="{{ url_for('donor_dashboard') }}" class="btn btn-warning btn-lg px-4 text-white fw-semibold shadow-sm">Go to Dashboard</a>
+                {% elif current_user.role == 'ngo' %}
+                    <a href="{{ url_for('ngo_dashboard') }}" class="btn btn-warning btn-lg px-4 text-white fw-semibold shadow-sm">Go to Dashboard</a>
+                {% elif current_user.role == 'volunteer' %}
+                    <a href="{{ url_for('volunteer_dashboard') }}" class="btn btn-warning btn-lg px-4 text-white fw-semibold shadow-sm">Go to Dashboard</a>
+                {% elif current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-warning btn-lg px-4 text-white fw-semibold shadow-sm">Admin Panel</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Key Impact Statistics -->
+<div class="container my-5">
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-3 col-sm-6">
+            <a href="{{ url_for('analytics') }}" class="card stat-card green p-3 text-center h-100">
+                <div class="card-icon green mx-auto mb-3">
+                    <i class="bi bi-gift-fill"></i>
+                </div>
+                <h3 class="fw-bold text-green mb-1">{{ stats.total_donations }}</h3>
+                <p class="text-muted mb-0 small uppercase fw-bold">Total Food Donated</p>
+            </a>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <a href="{{ url_for('analytics') }}" class="card stat-card orange p-3 text-center h-100">
+                <div class="card-icon orange mx-auto mb-3">
+                    <i class="bi bi-heart-pulse-fill"></i>
+                </div>
+                <h3 class="fw-bold text-orange mb-1">{{ stats.meals_saved }}</h3>
+                <p class="text-muted mb-0 small uppercase fw-bold">Meals Saved</p>
+            </a>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <a href="{{ url_for('analytics') }}" class="card stat-card green p-3 text-center h-100">
+                <div class="card-icon green mx-auto mb-3">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <h3 class="fw-bold text-green mb-1">{{ stats.active_users }}</h3>
+                <p class="text-muted mb-0 small uppercase fw-bold">Active Network Users</p>
+            </a>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <a href="{{ url_for('analytics') }}" class="card stat-card orange p-3 text-center h-100">
+                <div class="card-icon orange mx-auto mb-3">
+                    <i class="bi bi-truck"></i>
+                </div>
+                <h3 class="fw-bold text-orange mb-1">{{ stats.active_deliveries }}</h3>
+                <p class="text-muted mb-0 small uppercase fw-bold">Active Rescues</p>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- What We Do section -->
+<div class="bg-white py-5 border-top border-bottom border-light">
+    <div class="container px-4">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">How the Network Connects Us</h2>
+            <p class="text-muted mx-auto" style="max-width: 600px;">
+                Each role in our network performs a crucial part of the food waste rescue ecosystem.
+            </p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm p-4 text-center">
+                    <div class="fs-1 text-green mb-3"><i class="bi bi-shop"></i></div>
+                    <h5 class="fw-bold">1. Donors</h5>
+                    <p class="text-muted small">
+                        Restaurants, supermarkets, and catering companies easily upload edible food surplus details, expiry times, and pickup locations.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm p-4 text-center">
+                    <div class="fs-1 text-orange mb-3"><i class="bi bi-building"></i></div>
+                    <h5 class="fw-bold">2. NGOs</h5>
+                    <p class="text-muted small">
+                        Shelters, soup kitchens, and non-profits browse available donations in real time and request pickups to feed those in need.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm p-4 text-center">
+                    <div class="fs-1 text-green mb-3"><i class="bi bi-bicycle"></i></div>
+                    <h5 class="fw-bold">3. Volunteers</h5>
+                    <p class="text-muted small">
+                        Deliver heroes claim delivery tasks, coordinate directly with donors and NGOs, and transport meals to their final destinations.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm p-4 text-center">
+                    <div class="fs-1 text-orange mb-3"><i class="bi bi-shield-lock"></i></div>
+                    <h5 class="fw-bold">4. Admins</h5>
+                    <p class="text-muted small">
+                        Verify users, monitor activities, track performance charts, and ensure seamless delivery coordinates across the system.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- UN SDG Goal 2 Spotlight -->
+<div class="container my-5 py-3">
+    <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+            <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800&auto=format&fit=crop" class="img-fluid rounded-4 shadow" alt="UN SDG 2 - Zero Hunger" style="max-height: 400px; width: 100%; object-fit: cover;">
+        </div>
+        <div class="col-lg-6">
+            <span class="badge bg-orange text-white mb-2 text-uppercase fw-semibold">Global Focus</span>
+            <h2 class="fw-bold mb-3">Our Mission: UN SDG Goal 2</h2>
+            <p class="text-muted">
+                UN SDG Goal 2 focuses on ending hunger, achieving food security, improving nutrition, and promoting sustainable agriculture.
+            </p>
+            <p class="text-muted">
+                One-third of all food produced globally goes to waste, while millions of people go hungry. By connecting food surplus straight to local shelters, we reduce landfill waste, carbon emissions, and hunger simultaneously.
+            </p>
+            <a href="{{ url_for('about') }}" class="btn btn-success mt-2">
+                Learn More About SDG 2 <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

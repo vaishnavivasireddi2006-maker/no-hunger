@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}About SDG 2 - Community Food Waste Rescue Network{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center text-center mb-5">
+        <div class="col-lg-8">
+            <span class="badge bg-green text-white mb-2 text-uppercase px-3 py-2 fw-semibold">Our Mission</span>
+            <h1 class="fw-bold">Supporting UN SDG Goal 2: Zero Hunger</h1>
+            <p class="lead text-muted">
+                Addressing global food waste to create a sustainable, hunger-free community.
+            </p>
+        </div>
+    </div>
+
+    <!-- The Hunger & Waste Paradox Section -->
+    <div class="row align-items-center g-5 mb-5">
+        <div class="col-lg-6">
+            <h3 class="fw-bold mb-3 text-green"><i class="bi bi-patch-question me-2"></i>The Hunger & Waste Paradox</h3>
+            <p class="text-muted">
+                Globally, about 1.3 billion tons of food are wasted or lost annually—roughly one-third of all food produced for human consumption. At the same time, over 800 million people suffer from chronic undernourishment.
+            </p>
+            <p class="text-muted">
+                Food waste happens at all stages, from agriculture and processing to retail and households. A major portion of this waste consists of perfectly edible, fresh food from restaurants, hotels, and markets that simply goes unsold.
+            </p>
+            <div class="card bg-light-orange border-0 p-4 rounded-3 my-3">
+                <h5 class="fw-bold text-orange mb-2"><i class="bi bi-lightbulb-fill me-2"></i>Did you know?</h5>
+                <p class="mb-0 text-dark small">
+                    If we rescue just one-fourth of the food currently lost or wasted globally, it would be enough to feed 870 million hungry people in the world.
+                </p>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <img src="https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=800&auto=format&fit=crop" class="img-fluid rounded-4 shadow" alt="Hunger & Waste Paradox" style="max-height: 400px; width: 100%; object-fit: cover;">
+        </div>
+    </div>
+
+    <!-- What is SDG Goal 2? -->
+    <div class="row align-items-center g-5 flex-lg-row-reverse mb-5">
+        <div class="col-lg-6">
+            <h3 class="fw-bold mb-3 text-orange"><i class="bi bi-globe me-2"></i>What is Zero Hunger?</h3>
+            <p class="text-muted">
+                UN Sustainable Development Goal 2 aims to end hunger, achieve food security and improved nutrition, and promote sustainable agriculture by 2030. Key targets include:
+            </p>
+            <ul class="text-muted">
+                <li class="mb-2"><strong>Ending undernourishment:</strong> Ensuring all people have access to safe, nutritious, and sufficient food all year round.</li>
+                <li class="mb-2"><strong>Ending malnutrition:</strong> Eliminating all forms of malnutrition, particularly in children and vulnerable groups.</li>
+                <li class="mb-2"><strong>Doubling agricultural productivity:</strong> Boosting incomes and productivity of small-scale food producers.</li>
+                <li class="mb-2"><strong>Sustainable food production:</strong> Supporting agricultural practices that protect ecosystems and strengthen capacity for climate adaptation.</li>
+            </ul>
+        </div>
+        <div class="col-lg-6">
+            <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=800&auto=format&fit=crop" class="img-fluid rounded-4 shadow" alt="Zero Hunger Action" style="max-height: 400px; width: 100%; object-fit: cover;">
+        </div>
+    </div>
+
+    <!-- How this Platform Helps -->
+    <div class="card border-0 shadow-sm p-5 bg-green text-white text-center rounded-4 my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <h3 class="fw-bold mb-3">Our Technology in Action</h3>
+                <p class="lead mb-4 opacity-90">
+                    By providing a platform that links surplus food directly to local NGOs and logistics volunteers, we build a resilient, circular economy that addresses local food insecurity while diverting organic waste from landfills.
+                </p>
+                <div class="row g-4 text-dark text-start">
+                    <div class="col-md-4">
+                        <div class="bg-white p-4 rounded-3 h-100 shadow-sm">
+                            <h5 class="fw-bold text-green"><i class="bi bi-box-seam me-2"></i>Zero Waste</h5>
+                            <p class="small text-muted mb-0">Donating excess food avoids the landfill, reducing harmful methane emissions and waste of agricultural resources.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="bg-white p-4 rounded-3 h-100 shadow-sm">
+                            <h5 class="fw-bold text-orange"><i class="bi bi-heart-fill me-2"></i>Nutrition</h5>
+                            <p class="small text-muted mb-0">Enables NGOs to access fresh, varied, and nutritious meals, fruits, and bread for distribution.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="bg-white p-4 rounded-3 h-100 shadow-sm">
+                            <h5 class="fw-bold text-green"><i class="bi bi-hand-thumbs-up me-2"></i>Community</h5>
+                            <p class="small text-muted mb-0">Builds a collaborative rescue network where businesses, volunteers, and civil society coordinate together.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

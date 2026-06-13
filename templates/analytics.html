@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Community Food Waste Rescue Network{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center text-center mb-5">
+        <div class="col-lg-8">
+            <span class="badge bg-green text-white mb-2 text-uppercase px-3 py-2 fw-semibold">Platform Impact</span>
+            <h1 class="fw-bold">Rescue Network Analytics Dashboard</h1>
+            <p class="lead text-muted">
+                Tracking meals saved, active networks, and sustainability statistics in real time.
+            </p>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4 col-lg-2.4 col-sm-6">
+            <div class="card stat-card green p-3 text-center h-100" onclick="showSection('donations', this)" style="cursor: pointer;">
+                <div class="card-icon green mx-auto mb-2"><i class="bi bi-gift-fill"></i></div>
+                <h4 class="fw-bold text-green mb-1">{{ stats.total_donations }}</h4>
+                <p class="text-muted mb-0 small uppercase fw-bold">Food Donated</p>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2.4 col-sm-6">
+            <div class="card stat-card orange p-3 text-center h-100" onclick="showSection('meals', this)" style="cursor: pointer;">
+                <div class="card-icon orange mx-auto mb-2"><i class="bi bi-heart-pulse-fill"></i></div>
+                <h4 class="fw-bold text-orange mb-1">{{ stats.meals_saved }}</h4>
+                <p class="text-muted mb-0 small uppercase fw-bold">Meals Saved</p>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2.4 col-sm-6">
+            <div class="card stat-card green p-3 text-center h-100" onclick="showSection('donors', this)" style="cursor: pointer;">
+                <div class="card-icon green mx-auto mb-2"><i class="bi bi-shop"></i></div>
+                <h4 class="fw-bold text-green mb-1">{{ stats.active_donors }}</h4>
+                <p class="text-muted mb-0 small uppercase fw-bold">Active Donors</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-2.4 col-sm-6">
+            <div class="card stat-card orange p-3 text-center h-100" onclick="showSection('ngos', this)" style="cursor: pointer;">
+                <div class="card-icon orange mx-auto mb-2"><i class="bi bi-building"></i></div>
+                <h4 class="fw-bold text-orange mb-1">{{ stats.active_ngos }}</h4>
+                <p class="text-muted mb-0 small uppercase fw-bold">Active NGOs</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-2.4 col-sm-6">
+            <div class="card stat-card green p-3 text-center h-100" onclick="showSection('volunteers', this)" style="cursor: pointer;">
+                <div class="card-icon green mx-auto mb-2"><i class="bi bi-bicycle"></i></div>
+                <h4 class="fw-bold text-green mb-1">{{ stats.active_volunteers }}</h4>
+                <p class="text-muted mb-0 small uppercase fw-bold">Active Volunteers</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Details Section -->
+    <div class="row g-4 mb-5 d-none" id="detailsSection">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 p-4 glass-panel" style="background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(46, 125, 50, 0.15);">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold text-green mb-0" id="detailsTitle">
+                        <i class="bi bi-info-circle-fill me-2"></i>Details View
+                    </h4>
+                    <button class="btn-close" type="button" onclick="closeDetails()" aria-label="Close"></button>
+                </div>
+                
+                <div class="table-responsive">
+                    <!-- 1. Donors Table -->
+                    <table class="table table-hover align-middle d-none" id="table-donors">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Name / Organization</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Address</th>
+                                <th>Member Since</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in donors %}
+                                <tr>
+                                    <td><strong>{{ u.username }}</strong></td>
+                                    <td><a href="mailto:{{ u.email }}" class="text-green text-decoration-none">{{ u.email }}</a></td>
+                                    <td>{{ u.phone }}</td>
+                                    <td>{{ u.address }}</td>
+                                    <td>{{ u.created_at.strftime('%Y-%m-%d') }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-3">No active donors found in database.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- 2. NGOs Table -->
+                    <table class="table table-hover align-middle d-none" id="table-ngos">
+                        <thead class="table-light">
+                            <tr>
+                                <th>NGO Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Address</th>
+                                <th>Member Since</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in ngos %}
+                                <tr>
+                                    <td><strong>{{ u.username }}</strong></td>
+                                    <td><a href="mailto:{{ u.email }}" class="text-green text-decoration-none">{{ u.email }}</a></td>
+                                    <td>{{ u.phone }}</td>
+                                    <td>{{ u.address }}</td>
+                                    <td>{{ u.created_at.strftime('%Y-%m-%d') }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-3">No active NGOs found in database.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- 3. Volunteers Table -->
+                    <table class="table table-hover align-middle d-none" id="table-volunteers">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Volunteer Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Address</th>
+                                <th>Member Since</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in volunteers %}
+                                <tr>
+                                    <td><strong>{{ u.username }}</strong></td>
+                                    <td><a href="mailto:{{ u.email }}" class="text-green text-decoration-none">{{ u.email }}</a></td>
+                                    <td>{{ u.phone }}</td>
+                                    <td>{{ u.address }}</td>
+                                    <td>{{ u.created_at.strftime('%Y-%m-%d') }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-3">No active volunteers found in database.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- 4. Food Donated Table -->
+                    <table class="table table-hover align-middle d-none" id="table-donations">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Food Item</th>
+                                <th>Category</th>
+                                <th>Quantity</th>
+                                <th>Expiry Time</th>
+                                <th>Status</th>
+                                <th>Posted Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in donations %}
+                                <tr>
+                                    <td><strong>{{ d.food_item }}</strong></td>
+                                    <td><span class="badge bg-light text-dark border">{{ d.food_type }}</span></td>
+                                    <td>{{ d.quantity }}</td>
+                                    <td><small>{{ d.expiry_time.strftime('%Y-%m-%d %H:%M') }}</small></td>
+                                    <td>
+                                        <span class="badge {% if d.status == 'available' %}bg-info{% elif d.status == 'requested' %}bg-warning{% elif d.status == 'assigned' %}bg-primary{% elif d.status == 'completed' %}bg-success{% else %}bg-secondary{% endif %} text-uppercase text-white">
+                                            {{ d.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ d.created_at.strftime('%Y-%m-%d') }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-3">No donations found in database.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- 5. Meals Saved Table (Completed Donations) -->
+                    <table class="table table-hover align-middle d-none" id="table-meals">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Food Item</th>
+                                <th>Category</th>
+                                <th>Quantity Rescued</th>
+                                <th>Rescued Date</th>
+                                <th>Meals Saved (Est.)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set ns = namespace(found=false) %}
+                            {% for d in donations if d.status == 'completed' %}
+                                {% set ns.found = true %}
+                                <tr>
+                                    <td><strong>{{ d.food_item }}</strong></td>
+                                    <td><span class="badge bg-light text-dark border">{{ d.food_type }}</span></td>
+                                    <td>{{ d.quantity }}</td>
+                                    <td>{{ d.created_at.strftime('%Y-%m-%d') }}</td>
+                                    <td><span class="text-success fw-bold">+10 meals</span></td>
+                                    <td><span class="badge bg-success text-uppercase text-white">{{ d.status }}</span></td>
+                                </tr>
+                            {% endfor %}
+                            {% if not ns.found %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-3">No completed rescues found yet.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Layout -->
+    <div class="row g-4 mb-4">
+        <!-- Trends Chart -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <h5 class="fw-bold text-green mb-3"><i class="bi bi-graph-up me-2"></i>Monthly Rescue Trends (kg)</h5>
+                <div style="height: 300px; position: relative;">
+                    <canvas id="donationTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Doughnut Categories -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <h5 class="fw-bold text-orange mb-3"><i class="bi bi-pie-chart me-2"></i>Food Categories</h5>
+                <div style="height: 300px; position: relative;">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h5 class="fw-bold text-green mb-3"><i class="bi bi-bar-chart me-2"></i>Food Rescue Statistics (Completed vs Pending vs Expired)</h5>
+                <div style="height: 250px; position: relative;">
+                    <canvas id="rescueRateChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showSection(sectionType, cardElement) {
+    // Show the details section container
+    const detailsSection = document.getElementById('detailsSection');
+    detailsSection.classList.remove('d-none');
+    
+    // Hide all tables first
+    document.getElementById('table-donors').classList.add('d-none');
+    document.getElementById('table-ngos').classList.add('d-none');
+    document.getElementById('table-volunteers').classList.add('d-none');
+    document.getElementById('table-donations').classList.add('d-none');
+    document.getElementById('table-meals').classList.add('d-none');
+    
+    // Clear custom styling/borders from all cards
+    document.querySelectorAll('.stat-card').forEach(card => {
+        card.style.border = 'none';
+        card.style.boxShadow = '';
+    });
+    
+    // Apply visual highlight to selected card
+    if (cardElement) {
+        cardElement.style.border = '2px solid var(--accent-orange)';
+        cardElement.style.boxShadow = '0 8px 30px rgba(230, 81, 0, 0.15)';
+    }
+
+    // Set title and show target table
+    const titleEl = document.getElementById('detailsTitle');
+    
+    if (sectionType === 'donors') {
+        titleEl.innerHTML = '<i class="bi bi-shop me-2 text-green"></i>Active Donors Network';
+        document.getElementById('table-donors').classList.remove('d-none');
+    } else if (sectionType === 'ngos') {
+        titleEl.innerHTML = '<i class="bi bi-building me-2 text-orange"></i>Active NGOs Partners';
+        document.getElementById('table-ngos').classList.remove('d-none');
+    } else if (sectionType === 'volunteers') {
+        titleEl.innerHTML = '<i class="bi bi-bicycle me-2 text-green"></i>Active Volunteers Network';
+        document.getElementById('table-volunteers').classList.remove('d-none');
+    } else if (sectionType === 'donations') {
+        titleEl.innerHTML = '<i class="bi bi-gift-fill me-2 text-green"></i>Total Food Donated';
+        document.getElementById('table-donations').classList.remove('d-none');
+    } else if (sectionType === 'meals') {
+        titleEl.innerHTML = '<i class="bi bi-heart-pulse-fill me-2 text-orange"></i>Meals Saved (Completed Rescues)';
+        document.getElementById('table-meals').classList.remove('d-none');
+    }
+
+    // Smooth scroll to the details panel
+    detailsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function closeDetails() {
+    document.getElementById('detailsSection').classList.add('d-none');
+    
+    // Clear highlights
+    document.querySelectorAll('.stat-card').forEach(card => {
+        card.style.border = 'none';
+        card.style.boxShadow = '';
+    });
+}
+</script>
+{% endblock %}

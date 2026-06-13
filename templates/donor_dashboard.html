@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Donor Dashboard - Community Food Waste Rescue Network{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-header text-center">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-shop text-orange me-2"></i>Donor Portal</h5>
+            <span class="small opacity-75">Rescue Network</span>
+        </div>
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item">
+                <a class="nav-link active" href="#dashboard-home" data-bs-toggle="tab">
+                    <i class="bi bi-grid-1x2 me-2"></i>Overview
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#new-donation" data-bs-toggle="tab">
+                    <i class="bi bi-plus-circle me-2"></i>Donate Food
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#donation-history" data-bs-toggle="tab">
+                    <i class="bi bi-clock-history me-2"></i>My History
+                </a>
+            </li>
+        </ul>
+        <div class="mt-auto p-3 border-top border-white border-opacity-10 text-center">
+            <small class="opacity-75">Thank you for donating!</small>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div class="dashboard-content tab-content">
+        <!-- Tab 1: Overview -->
+        <div class="tab-pane fade show active" id="dashboard-home">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+                <div>
+                    <h2 class="fw-bold mb-1">Welcome, {{ current_user.username }}!</h2>
+                    <p class="text-muted mb-0">Track your donations and make a new impact today.</p>
+                </div>
+                <div>
+                    <a href="#new-donation" onclick="document.querySelector('a[href=\'#new-donation\']').click();" class="btn btn-warning text-white fw-bold shadow-sm">
+                        <i class="bi bi-plus-lg me-1"></i> New Food Donation
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="card stat-card green p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="fw-bold mb-1">{{ donations|length }}</h4>
+                                <p class="text-muted mb-0 small uppercase fw-semibold">Total Donations</p>
+                            </div>
+                            <div class="card-icon green">
+                                <i class="bi bi-journal-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stat-card orange p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="fw-bold mb-1">{{ active_count }}</h4>
+                                <p class="text-muted mb-0 small uppercase fw-semibold">Pending Rescues</p>
+                            </div>
+                            <div class="card-icon orange">
+                                <i class="bi bi-truck"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stat-card green p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="fw-bold mb-1">{{ completed_count }}</h4>
+                                <p class="text-muted mb-0 small uppercase fw-semibold">Completed Rescues</p>
+                            </div>
+                            <div class="card-icon green">
+                                <i class="bi bi-check2-all"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active / Recent Donations -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h4 class="fw-bold mb-3 text-green"><i class="bi bi-activity me-2"></i>Active Donations</h4>
+                {% if active_donations %}
+                    <div class="row g-4">
+                        {% for donation in active_donations %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card h-100 shadow-sm border-light">
+                                    <div class="donation-img-wrapper bg-light text-center d-flex align-items-center justify-content-center">
+                                        {% if donation.image_path %}
+                                            <img src="{{ url_for('static', filename='uploads/' + donation.image_path) }}" class="donation-img" alt="{{ donation.food_item }}">
+                                        {% else %}
+                                            <div class="text-muted"><i class="bi bi-image fs-1 opacity-25"></i><br><small>No Image</small></div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h5 class="card-title fw-bold mb-0 text-truncate" style="max-width: 150px;">{{ donation.food_item }}</h5>
+                                            <span class="badge bg-light text-dark">{{ donation.food_type }}</span>
+                                        </div>
+                                        <p class="card-text text-muted small mb-2"><i class="bi bi-box-seam me-1"></i>Qty: {{ donation.quantity }}</p>
+                                        <p class="card-text text-muted small mb-3"><i class="bi bi-geo-alt me-1"></i>{{ donation.location }}</p>
+                                        
+                                        <!-- Freshness Tag -->
+                                        <div class="mb-3">
+                                            <span class="freshness-timer-badge" data-expiry="{{ donation.expiry_time.isoformat() }}">Calculating...</span>
+                                        </div>
+
+                                        <!-- Status Tracker -->
+                                        <div class="border-top pt-2 d-flex justify-content-between align-items-center">
+                                            <span class="small text-muted">Status:</span>
+                                            {% if donation.status == 'available' %}
+                                                <span class="badge bg-info text-white">Available</span>
+                                            {% elif donation.status == 'requested' %}
+                                                <span class="badge bg-warning text-white">Requested</span>
+                                            {% elif donation.status == 'assigned' %}
+                                                <span class="badge bg-primary">Assigned</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-box2-heart fs-1 text-muted opacity-50 mb-3 d-block"></i>
+                        <p class="text-muted">You have no active food donations at the moment.</p>
+                        <a href="#new-donation" onclick="document.querySelector('a[href=\'#new-donation\']').click();" class="btn btn-sm btn-success">Donate Food</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Tab 2: Create Donation -->
+        <div class="tab-pane fade" id="new-donation">
+            <div class="card border-0 shadow-sm rounded-4 p-4" style="max-width: 700px; margin: 0 auto;">
+                <h3 class="fw-bold mb-3 text-green"><i class="bi bi-plus-circle me-2"></i>Create Food Donation</h3>
+                <p class="text-muted small mb-4">Provide details about the food surplus. Ensure safety guidelines and hygienic packing.</p>
+
+                <form action="{{ url_for('create_donation') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="food_item" class="form-label small fw-semibold">Food Item Name</label>
+                            <input type="text" class="form-control bg-light" id="food_item" name="food_item" required placeholder="Fresh Bread / Mixed Vegetables">
+                            <div class="invalid-feedback">Please enter the food item name.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="food_type" class="form-label small fw-semibold">Food Category</label>
+                            <select class="form-select bg-light" id="food_type" name="food_type" required>
+                                <option value="" disabled selected>Select category...</option>
+                                <option value="Cooked Meal">Cooked Meal</option>
+                                <option value="Bakery">Bakery / Bread</option>
+                                <option value="Fruits & Veg">Fruits & Vegetables</option>
+                                <option value="Groceries">Packaged Groceries</option>
+                                <option value="Dairy">Dairy Products</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a category.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="quantity" class="form-label small fw-semibold">Quantity / Portions</label>
+                            <input type="text" class="form-control bg-light" id="quantity" name="quantity" required placeholder="e.g. 10 kg, 25 meals">
+                            <div class="invalid-feedback">Please specify the quantity.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="expiry_time" class="form-label small fw-semibold">Best Before (Expiry Time)</label>
+                            <input type="datetime-local" class="form-control bg-light" id="expiry_time" name="expiry_time" required>
+                            <div class="invalid-feedback">Please select expiry datetime.</div>
+                        </div>
+                        <div class="col-12">
+                            <label for="location" class="form-label small fw-semibold">Pickup Address</label>
+                            <textarea class="form-control bg-light" id="location" name="location" rows="2" required placeholder="Specify details if different from registered address...">{{ current_user.address }}</textarea>
+                            <div class="invalid-feedback">Please specify the pickup location.</div>
+                        </div>
+                        <div class="col-12">
+                            <label for="food_image" class="form-label small fw-semibold">Food Photograph (Optional)</label>
+                            <input type="file" class="form-control bg-light" id="food_image" name="food_image" accept="image/*">
+                            <div class="form-text small">Uploading real food pictures helps volunteers and NGOs verify quality.</div>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-success w-100 py-2.5 fw-bold shadow-sm">
+                                Submit Donation <i class="bi bi-check-lg ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tab 3: History -->
+        <div class="tab-pane fade" id="donation-history">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h4 class="fw-bold mb-4 text-green"><i class="bi bi-clock-history me-2"></i>My Donation History</h4>
+                
+                {% if donations %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Food Item</th>
+                                    <th>Category</th>
+                                    <th>Quantity</th>
+                                    <th>Donated On</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for donation in donations %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if donation.image_path %}
+                                                    <img src="{{ url_for('static', filename='uploads/' + donation.image_path) }}" width="40" height="40" class="rounded object-fit-cover me-2" alt="">
+                                                {% else %}
+                                                    <div class="bg-light rounded p-2 me-2"><i class="bi bi-box-seam text-muted"></i></div>
+                                                {% endif %}
+                                                <span class="fw-bold">{{ donation.food_item }}</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge bg-light text-dark border">{{ donation.food_type }}</span></td>
+                                        <td>{{ donation.quantity }}</td>
+                                        <td>{{ donation.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>
+                                            {% if donation.status == 'available' %}
+                                                <span class="badge bg-info text-white">Available</span>
+                                            {% elif donation.status == 'requested' %}
+                                                <span class="badge bg-warning text-white">Requested</span>
+                                            {% elif donation.status == 'assigned' %}
+                                                <span class="badge bg-primary">Assigned</span>
+                                            {% elif donation.status == 'completed' %}
+                                                <span class="badge bg-success">Rescued</span>
+                                            {% elif donation.status == 'cancelled' %}
+                                                <span class="badge bg-secondary">Cancelled</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-clock-history fs-1 text-muted opacity-50 mb-3 d-block"></i>
+                        <p class="text-muted">You haven't made any donations yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

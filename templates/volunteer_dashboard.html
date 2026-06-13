@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Volunteer Dashboard - Community Food Waste Rescue Network{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-header text-center">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-bicycle text-orange me-2"></i>Volunteer Portal</h5>
+            <span class="small opacity-75">Rescue Network</span>
+        </div>
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item">
+                <a class="nav-link active" href="#vol-overview" data-bs-toggle="tab">
+                    <i class="bi bi-grid-1x2 me-2"></i>Overview & Active
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#claim-tasks" data-bs-toggle="tab">
+                    <i class="bi bi-geo-alt me-2"></i>Pending Pickups
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#vol-history" data-bs-toggle="tab">
+                    <i class="bi bi-clock-history me-2"></i>My History
+                </a>
+            </li>
+        </ul>
+        <div class="mt-auto p-3 border-top border-white border-opacity-10 text-center">
+            <small class="opacity-75">Hero of communities</small>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div class="dashboard-content tab-content">
+        <!-- Tab 1: Overview and Active tasks -->
+        <div class="tab-pane fade show active" id="vol-overview">
+            <h2 class="fw-bold mb-1">Welcome, {{ current_user.username }}!</h2>
+            <p class="text-muted mb-4">View your assigned deliveries or accept new volunteer food rescues.</p>
+
+            <!-- Stats -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="card stat-card green p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="fw-bold mb-1">{{ assignments|length }}</h4>
+                                <p class="text-muted mb-0 small uppercase fw-semibold">Total Deliveries</p>
+                            </div>
+                            <div class="card-icon green">
+                                <i class="bi bi-bicycle"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stat-card orange p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="fw-bold mb-1">{{ active_assignments|length }}</h4>
+                                <p class="text-muted mb-0 small uppercase fw-semibold">Active Deliveries</p>
+                            </div>
+                            <div class="card-icon orange">
+                                <i class="bi bi-truck"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stat-card green p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="fw-bold mb-1">{{ completed_count }}</h4>
+                                <p class="text-muted mb-0 small uppercase fw-semibold">Completed Rescues</p>
+                            </div>
+                            <div class="card-icon green">
+                                <i class="bi bi-trophy-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Deliveries -->
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h4 class="fw-bold mb-4 text-green"><i class="bi bi-map-fill me-2"></i>My Active Deliveries</h4>
+                
+                {% if active_assignments %}
+                    <div class="row g-4">
+                        {% for assign in active_assignments %}
+                            <div class="col-md-6">
+                                <div class="card shadow-sm border-light">
+                                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold text-green small"><i class="bi bi-shop me-1"></i>{{ assign.donation.donor.username }}</span>
+                                        <i class="bi bi-arrow-right text-muted"></i>
+                                        <span class="fw-bold text-orange small"><i class="bi bi-building me-1"></i>{{ assign.pickup_request.ngo.username }}</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="fw-bold mb-1">{{ assign.donation.food_item }}</h5>
+                                        <p class="text-muted small mb-2"><i class="bi bi-box-seam me-1"></i>Quantity: {{ assign.donation.quantity }}</p>
+                                        
+                                        <div class="bg-light p-3 rounded mb-3 small">
+                                            <strong><i class="bi bi-geo-alt-fill text-green me-1"></i>Pickup Address:</strong>
+                                            <p class="mb-2 text-dark">{{ assign.donation.location }}</p>
+                                            
+                                            <strong><i class="bi bi-geo-alt text-orange me-1"></i>NGO Address:</strong>
+                                            <p class="mb-0 text-dark">{{ assign.pickup_request.ngo.address }}</p>
+                                        </div>
+
+                                        <!-- Timers and Details -->
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <span class="small text-muted">Freshness:</span>
+                                            <span class="freshness-timer-badge" data-expiry="{{ assign.donation.expiry_time.isoformat() }}">Calculating...</span>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <span class="small text-muted">Donor Phone: </span><span class="small fw-semibold">{{ assign.donation.donor.phone }}</span><br>
+                                            <span class="small text-muted">NGO Phone: </span><span class="small fw-semibold">{{ assign.pickup_request.ngo.phone }}</span>
+                                        </div>
+
+                                        <div class="border-top pt-3 d-flex gap-2">
+                                            {% if assign.status == 'assigned' %}
+                                                <form action="{{ url_for('update_delivery_status', assignment_id=assign.id, new_status='picked_up') }}" method="POST" class="w-100">
+                                                    <button type="submit" class="btn btn-warning text-white fw-bold w-100">
+                                                        Mark Picked Up <i class="bi bi-truck ms-1"></i>
+                                                    </button>
+                                                </form>
+                                            {% elif assign.status == 'picked_up' %}
+                                                <form action="{{ url_for('update_delivery_status', assignment_id=assign.id, new_status='delivered') }}" method="POST" class="w-100">
+                                                    <button type="submit" class="btn btn-success fw-bold w-100">
+                                                        Mark Delivered <i class="bi bi-check-circle-fill ms-1"></i>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-signpost-2 fs-1 text-muted opacity-50 mb-3 d-block"></i>
+                        <p class="text-muted">You have no active deliveries. Head to "Pending Pickups" to accept tasks!</p>
+                        <a href="#claim-tasks" onclick="document.querySelector('a[href=\'#claim-tasks\']').click();" class="btn btn-sm btn-success">View Pickups</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Tab 2: Claim Deliveries -->
+        <div class="tab-pane fade" id="claim-tasks">
+            <h2 class="fw-bold mb-1">Available Pickup Requests</h2>
+            <p class="text-muted mb-4">Accept pending food delivery requests and connect surplus to NGOs.</p>
+
+            {% if pending_requests %}
+                <div class="row g-4">
+                    {% for req in pending_requests %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 shadow-sm border-light">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title fw-bold mb-0">{{ req.donation.food_item }}</h5>
+                                        <span class="badge bg-light text-dark border">{{ req.donation.food_type }}</span>
+                                    </div>
+                                    <p class="card-text text-muted small mb-2"><i class="bi bi-box-seam me-1"></i>Qty: {{ req.donation.quantity }}</p>
+                                    
+                                    <div class="bg-light p-2 rounded mb-3 small">
+                                        <strong><i class="bi bi-shop text-green me-1"></i>From:</strong> {{ req.donation.donor.username }}<br>
+                                        <strong><i class="bi bi-building text-orange me-1"></i>To:</strong> {{ req.ngo.username }}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <span class="small text-muted d-block"><strong>Instructions:</strong> {{ req.request_notes or 'No details provided' }}</span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <span class="freshness-timer-badge" data-expiry="{{ req.donation.expiry_time.isoformat() }}">Calculating...</span>
+                                    </div>
+
+                                    <form action="{{ url_for('claim_delivery', request_id=req.id) }}" method="POST">
+                                        <button type="submit" class="btn btn-success btn-sm w-100 fw-bold py-2">
+                                            Accept Task <i class="bi bi-bicycle ms-1"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-check2-circle fs-1 text-muted opacity-50 mb-3 d-block"></i>
+                    <p class="text-muted">There are no pending pickup requests right now. Thank you for checking!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Tab 3: History -->
+        <div class="tab-pane fade" id="vol-history">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h4 class="fw-bold mb-4 text-green"><i class="bi bi-clock-history me-2"></i>My Completed Rescues</h4>
+                {% if assignments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Food Item</th>
+                                    <th>Donor</th>
+                                    <th>NGO</th>
+                                    <th>Assigned On</th>
+                                    <th>Delivered On</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for assign in assignments %}
+                                    <tr>
+                                        <td><strong>{{ assign.donation.food_item }}</strong></td>
+                                        <td>{{ assign.donation.donor.username }}</td>
+                                        <td>{{ assign.pickup_request.ngo.username }}</td>
+                                        <td>{{ assign.assigned_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>{{ assign.delivered_at.strftime('%Y-%m-%d %H:%M') if assign.delivered_at else '-' }}</td>
+                                        <td>
+                                            {% if assign.status == 'delivered' %}
+                                                <span class="badge bg-success">Rescued & Delivered</span>
+                                            {% elif assign.status == 'cancelled' %}
+                                                <span class="badge bg-secondary">Cancelled</span>
+                                            {% else %}
+                                                <span class="badge bg-info text-white">Active</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-clock-history fs-1 text-muted opacity-50 mb-3 d-block"></i>
+                        <p class="text-muted">You haven't completed any food deliveries yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

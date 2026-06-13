@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+
+{% block title %}NGO Dashboard - Community Food Waste Rescue Network{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-header text-center">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-building text-orange me-2"></i>NGO Portal</h5>
+            <span class="small opacity-75">Rescue Network</span>
+        </div>
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item">
+                <a class="nav-link active" href="#ngo-overview" data-bs-toggle="tab">
+                    <i class="bi bi-grid-1x2 me-2"></i>Overview
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#browse-food" data-bs-toggle="tab">
+                    <i class="bi bi-search me-2"></i>Browse Donations
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#request-history" data-bs-toggle="tab">
+                    <i class="bi bi-list-check me-2"></i>Request History
+                </a>
+            </li>
+        </ul>
+        <div class="mt-auto p-3 border-top border-white border-opacity-10 text-center">
+            <small class="opacity-75">Providing meals, saving lives</small>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div class="dashboard-content tab-content">
+        <!-- Tab 1: Overview -->
+        <div class="tab-pane fade show active" id="ngo-overview">
+            <h2 class="fw-bold mb-1">Welcome, {{ current_user.username }}!</h2>
+            <p class="text-muted mb-4">Request fresh surplus food and feed those in need in your local area.</p>
+
+            <!-- Stats -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="card stat-card green p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="fw-bold mb-1">{{ requests|length }}</h4>
+                                <p class="text-muted mb-0 small uppercase fw-semibold">Total Requests Made</p>
+                            </div>
+                            <div class="card-icon green">
+                                <i class="bi bi-hand-thumbs-up"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stat-card orange p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="fw-bold mb-1">{{ pending_count }}</h4>
+                                <p class="text-muted mb-0 small uppercase fw-semibold">Pending Delivery</p>
+                            </div>
+                            <div class="card-icon orange">
+                                <i class="bi bi-hourglass-split"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stat-card green p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="fw-bold mb-1">{{ completed_count }}</h4>
+                                <p class="text-muted mb-0 small uppercase fw-semibold">Successfully Saved</p>
+                            </div>
+                            <div class="card-icon green">
+                                <i class="bi bi-patch-check-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Requests -->
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h4 class="fw-bold mb-3 text-green"><i class="bi bi-clock-history me-2"></i>Active Food Requests</h4>
+                {% if active_requests %}
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Food Item</th>
+                                    <th>Donor</th>
+                                    <th>Requested On</th>
+                                    <th>Delivery Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for req in active_requests %}
+                                    <tr>
+                                        <td><strong>{{ req.donation.food_item }}</strong></td>
+                                        <td>{{ req.donation.donor.username }}</td>
+                                        <td>{{ req.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>
+                                            {% if req.status == 'pending' %}
+                                                <span class="badge bg-warning text-white">Pending Assignment</span>
+                                            {% elif req.status == 'accepted' %}
+                                                {% set assignments = req.volunteer_assignments %}
+                                                {% if assignments and assignments|length > 0 %}
+                                                    {% if assignments[0].status == 'assigned' %}
+                                                        <span class="badge bg-info text-white">Volunteer En Route</span>
+                                                    {% elif assignments[0].status == 'picked_up' %}
+                                                        <span class="badge bg-primary">Picked Up (In Transit)</span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="badge bg-info text-white">Accepted</span>
+                                                {% endif %}
+                                            {% elif req.status == 'completed' %}
+                                                <span class="badge bg-success">Delivered</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox fs-1 text-muted opacity-50 mb-3 d-block"></i>
+                        <p class="text-muted">No active food requests at this time.</p>
+                        <a href="#browse-food" onclick="document.querySelector('a[href=\'#browse-food\']').click();" class="btn btn-sm btn-success">Browse Food</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Tab 2: Browse Food -->
+        <div class="tab-pane fade" id="browse-food">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <div>
+                    <h2 class="fw-bold mb-1">Browse Available Food</h2>
+                    <p class="text-muted mb-0">Claim edible surplus items and arrange for pickups.</p>
+                </div>
+            </div>
+
+            <!-- Search and Filter Panel -->
+            <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
+                <form id="filterForm" class="row g-2 align-items-center">
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                            <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Search food items (e.g. bread, meal)...">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select id="categoryFilter" class="form-select">
+                            <option value="">All Categories</option>
+                            <option value="Cooked Meal">Cooked Meal</option>
+                            <option value="Bakery">Bakery / Bread</option>
+                            <option value="Fruits & Veg">Fruits & Vegetables</option>
+                            <option value="Groceries">Packaged Groceries</option>
+                            <option value="Dairy">Dairy Products</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" id="resetFilters" class="btn btn-outline-secondary w-100">
+                            Clear Filters <i class="bi bi-x-circle ms-1"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Available Food Items Grid -->
+            {% if available_donations %}
+                <div class="row g-4" id="donationsGrid">
+                    {% for donation in available_donations %}
+                        <div class="col-md-6 col-lg-4 donation-card" data-title="{{ donation.food_item|lower }}" data-category="{{ donation.food_type }}">
+                            <div class="card h-100 shadow-sm border-light">
+                                <div class="donation-img-wrapper bg-light text-center d-flex align-items-center justify-content-center">
+                                    {% if donation.image_path %}
+                                        <img src="{{ url_for('static', filename='uploads/' + donation.image_path) }}" class="donation-img" alt="{{ donation.food_item }}">
+                                    {% else %}
+                                        <div class="text-muted"><i class="bi bi-image fs-1 opacity-25"></i><br><small>No Image</small></div>
+                                    {% endif %}
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title fw-bold mb-0 text-truncate" style="max-width: 150px;">{{ donation.food_item }}</h5>
+                                        <span class="badge bg-light text-dark border">{{ donation.food_type }}</span>
+                                    </div>
+                                    <p class="card-text text-muted small mb-2"><i class="bi bi-box-seam me-1"></i>Qty: {{ donation.quantity }}</p>
+                                    <p class="card-text text-muted small mb-2"><i class="bi bi-shop me-1"></i>Donor: {{ donation.donor.username }}</p>
+                                    <p class="card-text text-muted small mb-3"><i class="bi bi-geo-alt me-1"></i>{{ donation.location }}</p>
+                                    
+                                    <!-- Freshness Badge -->
+                                    <div class="mb-3">
+                                        <span class="freshness-timer-badge" data-expiry="{{ donation.expiry_time.isoformat() }}">Calculating...</span>
+                                    </div>
+
+                                    <!-- Action Button -->
+                                    <button class="btn btn-success btn-sm w-100 fw-bold py-2" data-bs-toggle="modal" data-bs-target="#requestModal{{ donation.id }}">
+                                        Request Food <i class="bi bi-hand-index-thumb ms-1"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pickup Request Modal -->
+                        <div class="modal fade" id="requestModal{{ donation.id }}" tabindex="-1" aria-labelledby="requestModalLabel{{ donation.id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 shadow rounded-4">
+                                    <div class="modal-header bg-green text-white">
+                                        <h5 class="modal-title fw-bold" id="requestModalLabel{{ donation.id }}"><i class="bi bi-building me-2"></i>Request Food Pickup</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <form action="{{ url_for('request_pickup', donation_id=donation.id) }}" method="POST">
+                                        <div class="modal-body p-4">
+                                            <p class="text-muted small">You are requesting the following food items. These details will be shared with the volunteer delivery network.</p>
+                                            
+                                            <div class="bg-light p-3 rounded mb-3 small">
+                                                <strong>Food Item:</strong> {{ donation.food_item }}<br>
+                                                <strong>Quantity:</strong> {{ donation.quantity }}<br>
+                                                <strong>Category:</strong> {{ donation.food_type }}<br>
+                                                <strong>Pickup Address:</strong> {{ donation.location }}
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="request_notes{{ donation.id }}" class="form-label small fw-semibold">Special Instructions / Notes</label>
+                                                <textarea class="form-control" id="request_notes{{ donation.id }}" name="request_notes" rows="3" placeholder="Provide details such as delivery instructions or urgency..."></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-success fw-bold px-4">Confirm Request</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-search fs-1 text-muted opacity-50 mb-3 d-block"></i>
+                    <p class="text-muted">No food items available at this time. Check back later!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Tab 3: Request History -->
+        <div class="tab-pane fade" id="request-history">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h4 class="fw-bold mb-4 text-green"><i class="bi bi-list-check me-2"></i>Pickup Request History</h4>
+                {% if requests %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Food Item</th>
+                                    <th>Donor</th>
+                                    <th>Category</th>
+                                    <th>Requested On</th>
+                                    <th>Instructions</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for req in requests %}
+                                    <tr>
+                                        <td><strong>{{ req.donation.food_item }}</strong></td>
+                                        <td>{{ req.donation.donor.username }}</td>
+                                        <td><span class="badge bg-light text-dark border">{{ req.donation.food_type }}</span></td>
+                                        <td>{{ req.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td><span class="small text-muted">{{ req.request_notes or 'None' }}</span></td>
+                                        <td>
+                                            {% if req.status == 'pending' %}
+                                                <span class="badge bg-warning text-white">Pending</span>
+                                            {% elif req.status == 'accepted' %}
+                                                <span class="badge bg-info text-white">Accepted</span>
+                                            {% elif req.status == 'completed' %}
+                                                <span class="badge bg-success">Rescued</span>
+                                            {% elif req.status == 'cancelled' %}
+                                                <span class="badge bg-secondary">Cancelled</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-clock-history fs-1 text-muted opacity-50 mb-3 d-block"></i>
+                        <p class="text-muted">You haven't requested any food yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Client-side search and filtering for available food cards
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const resetFiltersBtn = document.getElementById('resetFilters');
+        
+        if (searchInput && categoryFilter && resetFiltersBtn) {
+            function filterCards() {
+                const searchVal = searchInput.value.toLowerCase().trim();
+                const catVal = categoryFilter.value;
+                const cards = document.querySelectorAll('.donation-card');
+                
+                cards.forEach(card => {
+                    const title = card.getAttribute('data-title');
+                    const category = card.getAttribute('data-category');
+                    
+                    const matchesSearch = title.includes(searchVal);
+                    const matchesCategory = catVal === '' || category === catVal;
+                    
+                    if (matchesSearch && matchesCategory) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+            
+            searchInput.addEventListener('input', filterCards);
+            categoryFilter.addEventListener('change', filterCards);
+            
+            resetFiltersBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                categoryFilter.value = '';
+                filterCards();
+            });
+        }
+    });
+</script>
+{% endblock %}
