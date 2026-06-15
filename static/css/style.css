@@ -613,3 +613,43 @@ footer .fw-bold {
         border-radius: 0 0 24px 24px;
     }
 }
+
+/* Add more breathing room between sections */
+.dashboard-wrapper .main-content>* {
+    margin-bottom: 2.5rem;
+}
+
+.dashboard-wrapper .main-content {
+    padding: 2rem 2.5rem;
+}
+
+/* Add more breathing room between sections */
+.dashboard-content .tab-pane>* {
+    margin-bottom: 2rem;
+}
+
+.admin-stat {
+    padding: 1.75rem;
+}
+
+.card {
+    margin-bottom: 0.5rem;
+}
+
+.card-body {
+    padding: 1.5rem !important;
+}
+
+.table thead th,
+.table tbody td {
+    padding: 1rem !important;
+}
+
+#analytics .card {
+    margin-bottom: 1.5rem;
+}
+
+footer {
+    margin-top: 3rem;
+    padding: 2.5rem 0;
+}
