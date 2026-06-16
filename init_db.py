@@ -12,18 +12,18 @@ def seed_database():
     # --- Seed Users ---
     print("Seeding users...")
     
-    # 1. Admin
+    # 1. Admin (your account)
     admin = User(
-        username="Admin Controller",
-        email="admin@foodrescue.org",
+        username="vaishu",
+        email="vaishnavivasireddi@gmail.com",
         role="admin",
-        phone="555-0100",
-        address="Central Operations Hub, Suite 10"
+        phone="9704730368",
+        address="vizag"
     )
-    admin.set_password("admin123")
+    admin.set_password("vaishu@2006")
     db.session.add(admin)
 
-    # 2. Donor
+    # 2. Donors
     donor1 = User(
         username="Green Sourdough Bakery",
         email="donor@foodrescue.org",
@@ -74,7 +74,6 @@ def seed_database():
 
     now = datetime.utcnow()
 
-    # Donation 1: Available Sourdough Loaves
     d1 = Donation(
         donor_id=donor1.id,
         food_item="Fresh Sourdough Loaves",
@@ -87,7 +86,6 @@ def seed_database():
     )
     db.session.add(d1)
 
-    # Donation 2: Requested Vegetable Biryani
     d2 = Donation(
         donor_id=donor2.id,
         food_item="Vegetable Biryani Portions",
@@ -99,18 +97,16 @@ def seed_database():
         status="requested"
     )
     db.session.add(d2)
-    db.session.commit()  # commit to get ids
+    db.session.commit()
 
-    # Create request from NGO for Biryani
     r2 = PickupRequest(
         donation_id=d2.id,
         ngo_id=ngo1.id,
         status="pending",
-        request_notes="Urgent request. Food is needed for dinner distribution tonight at 7 PM."
+        request_notes="Urgent request for dinner distribution tonight at 7 PM."
     )
     db.session.add(r2)
 
-    # Donation 3: Assigned Fruit Baskets
     d3 = Donation(
         donor_id=donor1.id,
         food_item="Organic Fruit Baskets",
@@ -124,7 +120,6 @@ def seed_database():
     db.session.add(d3)
     db.session.commit()
 
-    # Create request and assignment for Fruits
     r3 = PickupRequest(
         donation_id=d3.id,
         ngo_id=ngo1.id,
@@ -143,7 +138,6 @@ def seed_database():
     )
     db.session.add(a3)
 
-    # Donation 4: Completed Rescue of Muffins
     d4 = Donation(
         donor_id=donor1.id,
         food_item="Vanilla Cupcakes & Muffins",
