@@ -15,12 +15,12 @@ def seed_database():
     # 1. Admin (your account)
     admin = User(
         username="vaishu",
-        email="vaishnavivasireddi@gmail.com",
+        email=os.environ.get('ADMIN_EMAIL', 'vaishnavivasireddi@gmail.com'),
         role="admin",
         phone="9704730368",
         address="vizag"
     )
-    admin.set_password("vaishu@2006")
+    admin.set_password(os.environ.get('ADMIN_PASSWORD', 'vaishu@2006'))
     db.session.add(admin)
 
     # 2. Donors
